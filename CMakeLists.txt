@@ -21,6 +21,7 @@ add_executable(equipment_sim
     src/main.cpp
     src/Logging.cpp
     src/EquipmentState.cpp
+    src/EquipmentWorker.cpp
     src/MainWindow.cpp
     src/MainWindow.ui
 )
