@@ -49,10 +49,10 @@ void TestAdversarialIntegration::testINT01_RandomizedMouseClickSequences() {
 
     std::mt19937 rng(1337);
     std::uniform_int_distribution<size_t> distBtn(0, buttons.size() - 1);
-    std::uniform_int_distribution<int> distDelay(5, 30);
+    std::uniform_int_distribution<int> distDelay(1, 2);
 
-    // Fire 60 randomized clicks with random settling times
-    for (int i = 0; i < 60; ++i) {
+    // Fire 500 randomized clicks with random settling times
+    for (int i = 0; i < 500; ++i) {
         QPushButton *btn = buttons[distBtn(rng)];
         QTest::mouseClick(btn, Qt::LeftButton);
 

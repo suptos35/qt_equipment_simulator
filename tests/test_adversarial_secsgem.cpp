@@ -32,6 +32,12 @@ private slots:
 
     // SECS-05: Connect without selecting
     void testSECS05_ConnectWithoutSelecting();
+
+    // SECS-06: Hostile Length Field
+    void testSECS06_HostileLengthField();
+
+    // SECS-07: Multi-client Connection Rejection
+    void testSECS07_MultiClientConnection();
 };
 
 void TestAdversarialSecsGem::initTestCase() {
@@ -188,6 +194,64 @@ void TestAdversarialSecsGem::testSECS05_ConnectWithoutSelecting() {
     socket.disconnectFromHost();
     QTest::qWait(50);
     QCOMPARE(server.getHsmsState(), HsmsState::NotConnected);
+}
+
+void TestAdversarialSecsGem::testSECS06_HostileLengthField() {
+    SecsServer server;
+    QVERIFY(server.startListening(0));
+    quint16 port = server.getBoundPort();
+
+    QTcpSocket rawSocket;
+    rawSocket.connectToHost(QStringLiteral("127.0.0.1"), port);
+    QVERIFY(rawSocket.waitForConnected(2000));
+
+    // Claim a huge length (500MB)
+    QByteArray hugeClaim;
+    uint32_t claimed = 500 * 1024 * 1024; // 500 MB
+    hugeClaim.append(static_cast<char>((claimed >> 24) & 0xFF));
+    hugeClaim.append(static_cast<char>((claimed >> 16) & 0xFF));
+    hugeClaim.append(static_cast<char>((claimed >> 8) & 0xFF));
+    hugeClaim.append(static_cast<char>(claimed & 0xFF));
+    hugeClaim.append("12345"); // Send just a few bytes
+    
+    rawSocket.write(hugeClaim);
+    rawSocket.flush();
+    QTest::qWait(100);
+
+    // Server must not crash or allocate 500MB and run out of memory. 
+    // Usually handled by reading available bytes only, or disconnecting.
+    QVERIFY(server.getHsmsState() == HsmsState::Connected || server.getHsmsState() == HsmsState::NotConnected);
+    rawSocket.disconnectFromHost();
+}
+
+void TestAdversarialSecsGem::testSECS07_MultiClientConnection() {
+    SecsServer server;
+    QVERIFY(server.startListening(0));
+    quint16 port = server.getBoundPort();
+
+    // First client connects
+    QTcpSocket client1;
+    client1.connectToHost(QStringLiteral("127.0.0.1"), port);
+    QVERIFY(client1.waitForConnected(2000));
+    QTest::qWait(50);
+    QCOMPARE(server.getHsmsState(), HsmsState::Connected);
+
+    // Second client attempts to connect
+    QTcpSocket client2;
+    client2.connectToHost(QStringLiteral("127.0.0.1"), port);
+    // Depending on Qt's QTcpServer implementation without maxPendingConnections logic, 
+    // it might accept the socket. SecsServer should ideally close the second one or ignore it.
+    // Wait and check state hasn't been corrupted.
+    QTest::qWait(100);
+    
+    // State should still just be Connected from the first client, no crash.
+    QCOMPARE(server.getHsmsState(), HsmsState::Connected);
+
+    // To strictly test rejection, client2 might get disconnected immediately.
+    // We just verify it doesn't crash the server.
+    client1.disconnectFromHost();
+    client2.disconnectFromHost();
+    QTest::qWait(50);
 }
 
 QTEST_MAIN(TestAdversarialSecsGem)

@@ -1,5 +1,5 @@
-build/
-logs/*.log
+build*/
+logs/*.log*
 docs/html/
 *.o
 CMakeCache.txt
