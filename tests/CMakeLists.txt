@@ -31,3 +31,14 @@ add_executable(test_logger_thread
 target_include_directories(test_logger_thread PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(test_logger_thread PRIVATE Threads::Threads)
 add_test(NAME test_logger_thread COMMAND test_logger_thread)
+
+# 4. StateMachine transition lifecycle and rejection test
+add_executable(test_statemachine
+    test_statemachine.cpp
+    ${CMAKE_SOURCE_DIR}/src/StateMachine.cpp
+    ${CMAKE_SOURCE_DIR}/src/EquipmentState.cpp
+    ${CMAKE_SOURCE_DIR}/src/Logging.cpp
+)
+target_include_directories(test_statemachine PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(test_statemachine PRIVATE Qt6::Test Qt6::Core)
+add_test(NAME test_statemachine COMMAND test_statemachine)
