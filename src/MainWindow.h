@@ -6,7 +6,13 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QThread>
+#include <QListWidget>
 #include <memory>
+
+#include "EquipmentWorker.h"
+#include "StateMachine.h"
+#include "GaugeWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,29 +20,37 @@ QT_END_NAMESPACE
 
 /**
  * @class MainWindow
- * @brief Manages the main operator interface, telemetry displays, and control triggers.
+ * @brief Coordinates GUI events, multithreaded simulation telemetry, and state machine controls.
  */
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructs the MainWindow.
-     * @param parent Optional parent QWidget.
-     */
     explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
     /**
-     * @brief Destructs the MainWindow.
+     * @brief Accessor to the internal event log widget for automated testing.
      */
-    ~MainWindow() override;
+    [[nodiscard]] QListWidget* getLogListWidget() const;
+
+    /**
+     * @brief Accessor to the state machine for test inspection.
+     */
+    [[nodiscard]] StateMachine& getStateMachine() noexcept;
 
 public slots:
     /**
-     * @brief Appends a diagnostic or status message to the UI event log.
-     * @param message Text string to append.
+     * @brief Thread-safe slot invoked via Qt::QueuedConnection by the global logging handler.
+     * @param msgType QtMsgType enum value.
+     * @param formattedMsg Full formatted diagnostic string.
      */
-    void appendLogMessage(const QString &message);
+    Q_INVOKABLE void appendLogEntry(int msgType, const QString &formattedMsg);
+
+    void onDataUpdated(double position, double temperature, EquipmentStatus status);
+    void onWorkerStatusChanged(EquipmentStatus newStatus);
+    void onStateChanged(EquipmentStatus from, EquipmentStatus to);
+    void onTransitionRejected(EquipmentStatus current, const QString &trigger);
 
 private slots:
     void onStartClicked();
@@ -46,5 +60,11 @@ private slots:
     void onTriggerErrorClicked();
 
 private:
+    void setupConnections();
+    void updateStatusDisplay(EquipmentStatus status);
+
     std::unique_ptr<Ui::MainWindow> ui;
+    QThread *m_workerThread{nullptr};
+    EquipmentWorker *m_worker{nullptr};
+    StateMachine m_stateMachine;
 };

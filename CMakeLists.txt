@@ -24,6 +24,7 @@ add_executable(equipment_sim
     src/EquipmentWorker.cpp
     src/LoggerThread.cpp
     src/StateMachine.cpp
+    src/GaugeWidget.cpp
     src/MainWindow.cpp
     src/MainWindow.ui
 )
