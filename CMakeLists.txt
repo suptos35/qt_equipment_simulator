@@ -25,6 +25,8 @@ add_executable(equipment_sim
     src/LoggerThread.cpp
     src/StateMachine.cpp
     src/GaugeWidget.cpp
+    src/SecsServer.cpp
+    src/SecsClient.cpp
     src/MainWindow.cpp
     src/MainWindow.ui
 )

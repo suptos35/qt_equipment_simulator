@@ -61,3 +61,15 @@ add_executable(test_gui_log
 target_include_directories(test_gui_log PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(test_gui_log PRIVATE Qt6::Widgets Qt6::Test Qt6::Core)
 add_test(NAME test_gui_log COMMAND test_gui_log)
+
+# 6. SECS/GEM HSMS and SECS-II integration test
+add_executable(test_secsgem
+    test_secsgem.cpp
+    ${CMAKE_SOURCE_DIR}/src/SecsServer.cpp
+    ${CMAKE_SOURCE_DIR}/src/SecsClient.cpp
+    ${CMAKE_SOURCE_DIR}/src/Logging.cpp
+    ${CMAKE_SOURCE_DIR}/src/LoggerThread.cpp
+)
+target_include_directories(test_secsgem PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(test_secsgem PRIVATE Qt6::Network Qt6::Test Qt6::Core)
+add_test(NAME test_secsgem COMMAND test_secsgem)
