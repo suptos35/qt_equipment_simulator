@@ -20,6 +20,7 @@ add_subdirectory(tests)
 add_executable(equipment_sim
     src/main.cpp
     src/Logging.cpp
+    src/EquipmentState.cpp
     src/MainWindow.cpp
     src/MainWindow.ui
 )
