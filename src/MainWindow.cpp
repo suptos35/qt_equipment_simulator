@@ -114,12 +114,10 @@ void MainWindow::updateStatusDisplay(EquipmentStatus status) {
 }
 
 void MainWindow::onDataUpdated(double position, double temperature, EquipmentStatus status) {
+    Q_UNUSED(status);
     ui->lblPosition->setText(QString("%1 mm").arg(position, 0, 'f', 2));
     ui->lblTemperature->setText(QString("%1 °C").arg(temperature, 0, 'f', 2));
     ui->gaugeTemperature->setValue(temperature);
-
-    // Keep UI status indicator synchronized
-    updateStatusDisplay(status);
 }
 
 void MainWindow::onWorkerStatusChanged(EquipmentStatus newStatus) {

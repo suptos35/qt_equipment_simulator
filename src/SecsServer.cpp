@@ -156,6 +156,12 @@ void SecsServer::processPacket(const HsmsHeader &hdr, const QByteArray &body) {
     }
 
     if (sType == HsmsSType::DataMessage) {
+        if (m_hsmsState != HsmsState::Selected) {
+            qWarning(logSecs) << "SECS Server: Rejected SECS-II data message received while in non-SELECTED state ("
+                              << SecsProtocol::hsmsStateToString(m_hsmsState) << ")";
+            return;
+        }
+
         uint8_t stream = hdr.stream & 0x7F; // Mask W-bit
         uint8_t function = hdr.function;
 
