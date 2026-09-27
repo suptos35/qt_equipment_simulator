@@ -1,0 +1,9 @@
+build/
+logs/*.log
+docs/html/
+*.o
+CMakeCache.txt
+CMakeFiles/
+.venv/
+__pycache__/
+.cache/
