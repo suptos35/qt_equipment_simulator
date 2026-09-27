@@ -7,3 +7,4 @@ CMakeFiles/
 .venv/
 __pycache__/
 .cache/
+docs/latex/
