@@ -1,6 +1,6 @@
 # Qt Equipment Simulator
 
-A production-grade C++ desktop application simulating automated semiconductor manufacturing equipment. Built using C++17, Qt6 Widgets, and modern POSIX/C++ concurrency primitives, the application models automated machine control software: live simulated multi-sensor telemetry, strict state machine lifecycle transitions (`Idle`, `Homing`, `Running`, `Error`), asynchronous background execution with a non-blocking GUI event loop, a hand-built mutex-guarded producer-consumer file logger with continuous rotation, and a SEMI E37 (HSMS) / SEMI E5 (SECS-II) communication engine over TCP/IP.
+A C++ desktop equipment simulator and learning project modeling automated semiconductor manufacturing equipment. Built using C++17, Qt6 Widgets, and modern POSIX/C++ concurrency primitives, the application models automated machine control software: live simulated multi-sensor telemetry, strict state machine lifecycle transitions (`Idle`, `Homing`, `Running`, `Error`), asynchronous background execution with a non-blocking GUI event loop, a hand-built mutex-guarded producer-consumer file logger with continuous rotation, and a SEMI E37 (HSMS) / SEMI E5 (SECS-II) communication engine over TCP/IP.
 
 ---
 
@@ -126,7 +126,7 @@ Implements standard factory automation communications over TCP/IP:
 
 ### 2. ThreadSanitizer (TSAN) Strategy
 - **The Challenge**: Compiling entire Qt applications with `-fsanitize=thread` against standard distribution-installed Qt libraries generates extensive false positives due to Qt's internal atomic reference counting and lock-free event loop optimizations.
-- **The Solution**: `LoggerThread`'s synchronization logic is completely decoupled from Qt (uses only standard library headers). Its test suite (`test_logger_thread`) links zero Qt libraries and compiles cleanly with `-fsanitize=thread`, providing 100% verified race-free concurrency.
+- **The Solution**: `LoggerThread`'s synchronization logic is completely decoupled from Qt (uses only standard library headers). Its test suite (`test_logger_thread`) links zero Qt libraries and compiles cleanly with `-fsanitize=thread`, confirming it is TSAN-clean under the test suite.
 
 ---
 
